@@ -1,27 +1,104 @@
+.instrument-serif-regular {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
+.instrument-serif-regular-italic {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.lato-thin {
+  font-family: "Lato", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.lato-light {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.lato-regular {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lato-bold {
+  font-family: "Lato", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.lato-black {
+  font-family: "Lato", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.lato-thin-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.lato-light-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.lato-regular-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.lato-bold-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.lato-black-italic {
+  font-family: "Lato", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
 
 h1 {
     font-size: 4rem;
-    color: #383838;
     padding: 0%;
-    margin-bottom: 0%;
+    margin-bottom: 1rem;
+    font-weight: 300;
+}
 
+h2 {
+    font-size: 2.5rem;
+    color: #383838;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 300;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f8f8ff;
-    color: #383838;
-    font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
+    background-color: #f7fcfe;
+    color: #180614;
+    margin: 0;
 }
 
 ul.custom {
     list-style-type: '> ';
-    /* Or any other single character/emoji */
+    padding-left: 1.2rem;
+}
 
+ul.custom li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
 }
 
 ul li::marker {
@@ -34,51 +111,77 @@ a {
 }
 
 p {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 .container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 80%;
+    min-height: 100vh;
+    width: 100%;
+    padding: 4rem 0; /* Ensures ample scrolling cushion top and bottom */
+    box-sizing: border-box;
 }
 
+/* Desktop Grid Configuration */
 .content {
-    max-width: 80%;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; 
+    column-gap: 4rem;                 
+    row-gap: 3rem;                     /* Generates separate row spacing for the news container */
+    max-width: 900px;                 
+    width: 85%;
+    align-items: center;              
+}
+
+.text-block {
+    display: flex;
+    flex-direction: column;
 }
 
 .face {
-    max-width: 35%;
+    width: 100%;                      
+    max-width: 320px;                 
     height: auto;
+    border-radius: 12px; 
+    justify-self: center;             
 }
 
-/* Styles applied ONLY on mobile screens (less than 768px wide) */
+/* Forces News to span both layout columns */
+.news-section {
+    grid-column: 1 / -1;
+    border-top: 1px solid #e2e8f0;    /* Optional divider line for cleaner layout break */
+    padding-top: 2rem;
+}
+
+/* Responsive Mobile Styles */
 @media screen and (max-width: 767px) {
     .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        width: 90%;
+        align-items: flex-start;      
+        padding: 3rem 0;
     }
 
     .content {
-        max-width: 90%;
+        grid-template-columns: 1fr;   
+        gap: 2.5rem;
+        width: 88%;
     }
 
     .face {
-        max-width: 100%;
-        height: auto;
+        max-width: 260px;             
     }
 
     h1 {
-        font-family: 'alte_haas_groteskbold';
         font-size: 3rem;
-        color: #121212;
-        padding: 0%;
-        margin-bottom: 0%;
+    }
 
+    h2 {
+        font-size: 2rem;
+    }
+
+    .news-section {
+        grid-column: auto;             /* Soft resets grid track back to a default row element */
     }
 }
