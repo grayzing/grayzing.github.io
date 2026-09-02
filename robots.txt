@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://grayzing.github.io/sitemap.xml

@@ -10,12 +10,11 @@ body {
 }
 
 .main-wrapper {
-    max-width: 80%; /* Increased for better mobile usage */
-    text-align: center;
+    width: min(90%, 650px);
 }
 
-p, h1 {
-  font-family: "JetBrains Mono", monospace;
+p {
+  font-family: "Geist", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
@@ -23,12 +22,39 @@ p, h1 {
 }
 
 h1 {
+    font-family: "JetBrains Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
     font-size: 1.5rem;
 }
 
 a {
-    text-decoration: none;
     color: #3437cd;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.papers {
+    margin: 2rem 0;
+}
+
+.papers h2 {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+}
+
+.paper {
+    margin-bottom: 1.25rem;
+}
+
+.paper p {
+    margin: 0;
 }
 
 /* Media query for larger screens */
