@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Blog</title>
+    <link rel="stylesheet" href="../stylesheet.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="7FlgEmVqoOB1BhO_HvRHb4YzJjVlGPB8psGFXc4YxLY" />
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body>
+    <div class="main-wrapper" role="main">
+
+        <header class="site-header">
+            <div>
+                <h1>Blog</h1>
+                <a href="/">home</a>
+
+            </div>
+
+        </header>
+
+        <div class="content">
+            <h2>OTA testing of near-real-time RAW optimization algorithms</h2>
+            <p>RAW optimization papers typically evaluate their algorithms in a simulator like ns3 or MATLAB. For
+                large-scale tests, this is necessary-- buying dozens or even hundreds of STAs is quite expensive.
+                However, simulation-based evaluations still raise the question of <i>how do you implement this on real
+                    hardware</i>? Such papers do not mention it, and if they do, they gloss over it.</p>
+            <p>This entry investigates what it's like <i>actually implementing a RAW optimization algorithm on a COTS
+                    IEEE 802.11ah AP</i>. I will be using a Raspberry Pi 4 + <a
+                    href="https://wiki.seeedstudio.com/getting_started_with_wifi_halow_mini_pcie_module/"
+                    target="_blank">WiFi HaLow Mini PCIe module</a> running a <a
+                    href="https://github.com/Wvirgil123/openwrt/releases" target="_blank">custom OpenWRT
+                    installation</a>. The algorithm of choice is the Soft Actor Critic algorithm, for reasons I will explain later in this entry..</p>
+            <img src="photos/photo1.JPEG" alt="A photo of a Raspberry Pi 4 wearing a WM1302 Raspberry Pi Hat and a Seeed WiFi HaLow mini PCIe module">
+            <p>The Raspberry Pi 4 is wearing a WM1302 Raspberry Pi Hat (Mini PCIe to PCIe adapter) with the WiFi HaLow mini PCIe module attached. The antenna is cropped out.</p>
+            <h3>Near-real-time RAW optimization on COTS AP</h3>
+            <p>On OpenWRT configured for IEEE 802.11ah, it is actually quite simple to configure the RAW. You simply run
+                <code>morse_cli raw -s [duration_μs],[num_slots] -a [aid_start],[aid_end] -t [start_time_μs] enable [raw_id]</code>
+            </p>
+            <p>An interesting implementation detail of OpenWRT's RAW driver is that it specifies RAW groups by AID
+                ranges. This is simple to implement, but becomes complicated if you want to do something fancy like
+                dynamic RAW group reassignment. IEEE 802.11ah has specified a <a target="_blank"
+                    href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5134619/">RAW reassignment frame</a> since 2016, but
+                <code>morse_driver</code> seems to be noncompliant in this regard.
+            </p>
+            <code>morse_driver</code> seems to expose a
+                plethora of KPIs we can use, accessible by running <code>iw dev wlan0 station dump</code>. I won't list everything that is exposed, but there are important KPIs that are directly accessible in or may be derived from the output:
+            </p>
+            <ul>
+                <li>Expected throughput of a STA including header</li>
+                <li>Packet drop ratio</li>
+            </ul>
+            <p>If you want to see ALL KPIs that are exposed in the <code>morse_driver</code>, read <code>morse_cli/transport/nl80211_copy.h</code></p>
+            <h3>The candidate algorithm</h3>
+            <p>Let's consider this problem a <a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov Decision Process</a>. You can find resources on Markov Decision Processes online.</p>
+            <h4>Why choose Proximal Policy Optimization?</h4>
+            <p>Consider these factors:</p>
+            <ol>
+                <li><strong>Online learning</strong>: In this project, RAW optimization is learned online, that is, <i>through continuous trial-and-error with the environment</i>. While Proximal Policy Optimization is ont as sampl-efficient as, say, Soft Actor Critic, it excels in that it does not need to retain MDP transitions to learn from. It simply takes a rollout and tosses it out after it's done with that learning step. This becomes even more attractive when you consider the memory and compute constraints of the Raspberry Pi 4-- four gigabytes of RAM at maximum, and inference + learning must be done quite quickly.</li>
+                <li><strong>Simplicity of implementation</strong>: This is subjective. But PPO is a few lines of Python, essentially. If you want to make something like SAC truly viable, you have to implement a Prioritzed Replay Buffer using a sum tree, dealing with OOM errors, sampling from the buffer, and so on. It becomes a headache.</li>
+            </ol>
+            <h4>Action</h4>
+            <p>For simplicity's sake, the action space is a \( \boldsymbol{\alpha}=\{\alpha_1,\alpha_2,\dots,\alpha_k\}
+                \)vector, where \( \forall \alpha_i \in \boldsymbol{\alpha}, 0\leq\alpha_i\leq1\) and \(k\) is the
+                number of RAW groups defined. These are parameters for a Dirichlet probability distribution. From here
+                we sample from the distribution to get the proportion of the beacon interval to allocate to each RAW
+                group defined by the operator. A controller takes this as input and translates them into workable RAW reconfiguration commands, i.e., start times, durations.</p>
+            <h4>Reward</h4>
+            <p>The reward can be simple. Here, we just want to maximize throughput and minimize the packet drop rate,
+                i.e., enhance reliability and datarate of the network. Take \(r_t\) to be the reward observed at step \(t\), \(y_i,p_i\) to be the packet drop ratio and expected throughput respectively of the \(i\)th STA, and \(n\) to be the number of STAs associated with the AP,
+                $$
+                    r_t = a_1 \frac{\sum_{i=1}^n y_i}{n} + a_2 \frac{\sum_{i=1}^n a_i}{n}
+                $$
+            </p>
+            <h4>State</h4>
+            <p>It is important for the model to have the minimal necessary state to maximize the reward.</p>
+        </div>
+    </div>
+</body>
+
+</html>
