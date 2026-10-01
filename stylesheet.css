@@ -118,7 +118,66 @@ a:hover {
     text-decoration: underline;
 }
 
+/* Projects Section */
+.projects {
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.projects h2 {
+    margin: 0 0 1.25rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.project-card {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.project-thumb {
+    width: 120px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.project-details {
+    flex-grow: 1;
+}
+
+.project-details h3 {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 0.3rem 0;
+}
+
+.project-details p {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.95rem;
+}
+
+.github-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
 @media (max-width: 480px) {
+
+    .project-card {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .project-thumb {
+        width: 100%;
+        height: 160px;
+    }
     .main-wrapper {
         text-align: left;
     }
