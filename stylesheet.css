@@ -10,7 +10,8 @@ body {
     font-family: "Geist", sans-serif;
     font-size: 17px;
     line-height: 1.6;
-    color: #1A1A1A;
+    background-color: #1A1A1A;
+    color: #FFFFFF;
 }
 
 .main-wrapper {
@@ -88,7 +89,7 @@ code {
     border-radius: 8px;
 }
 
-.papers {#1A1A1A
+.papers {
     margin: 2rem 0;
     text-align: left;
 }
@@ -110,7 +111,7 @@ code {
 }
 
 a {
-    color: #3437cd;
+    color: #4d6fec;
     text-decoration: none;
 }
 
