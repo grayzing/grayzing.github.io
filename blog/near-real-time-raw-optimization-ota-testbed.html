@@ -70,7 +70,7 @@
             </ol>
             <h4>Action</h4>
             <p>For simplicity's sake, the action space is a \( \boldsymbol{\alpha}=\{\alpha_1,\alpha_2,\dots,\alpha_k\}
-                \)vector, where \( \forall \alpha_i \in \boldsymbol{\alpha}, 0\leq\alpha_i\leq1\) and \(k\) is the
+                \)vector, where \( \forall \alpha_i \in \boldsymbol{\alpha}, 0<\alpha_i\) and \(k\) is the
                 number of RAW groups defined. These are parameters for a Dirichlet probability distribution. From here
                 we sample from the distribution to get the proportion of the beacon interval to allocate to each RAW
                 group defined by the operator. A controller takes this as input and translates them into workable RAW reconfiguration commands, i.e., start times, durations.</p>
@@ -82,7 +82,7 @@
                 $$
             </p>
             <h4>State</h4>
-            <p>It is important for the model to have the minimal necessary state to maximize the reward.</p>
+            <p>It is important for the model to have the minimal necessary state to maximize the reward. For simplicity, I'll be using a permutation-invariant operator to aggregate packet loss and throughput KPIs gathered from the STAs.</p>
         </div>
     </div>
 </body>
